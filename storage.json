@@ -1,0 +1,28 @@
+[
+    {
+      "question": "What is the capital of France?",
+      "choices": ["a) Berlin", "b) Madrid", "c) Paris", "d) Rome"],
+      "answer": "c"
+    },
+    {
+      "question": "Which planet is known as the Red Planet?",
+      "choices": ["a) Venus", "b) Mars", "c) Jupiter", "d) Saturn"],
+      "answer": "b"
+    },
+    {
+      "question": "Who wrote 'To Kill a Mockingbird'?",
+      "choices": ["a) Harper Lee", "b) J.K. Rowling", "c) George Orwell", "d) Mark Twain"],
+      "answer": "a"
+    },
+    {
+      "question": "What is the largest ocean on Earth?",
+      "choices": ["a) Atlantic Ocean", "b) Indian Ocean", "c) Pacific Ocean", "d) Arctic Ocean"],
+      "answer": "c"
+    },
+    {
+      "question": "What is the freezing point of water in Celsius?",
+      "choices": ["a) 0°C", "b) 32°C", "c) -32°C", "d) 100°C"],
+      "answer": "a"
+    }
+  ]
+  

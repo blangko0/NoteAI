@@ -5,7 +5,25 @@ import { setUp } from './helper/storage';
 import { useFonts } from 'expo-font';
 import Stack from './Stack';
 import { useEffect } from 'react';
+import * as FileSystem from 'expo-file-system';
+import storageJson from "./storage.json"
+const loadQuestions = async () => {
+  try {
+    // Get the path to the document directory
+    const uri = FileSystem.documentDirectory + 'storage.json';
 
+    // Read the file as a string
+    const fileContents = await FileSystem.readAsStringAsync(uri);
+
+    // Parse the JSON string
+    const data = JSON.parse(fileContents);
+
+    // Set the data to state
+     console.log(data)
+  } catch (e) {
+    console.log(" asdas " + FileSystem.documentDirectory)
+  }
+};
 
 const MyButton = () => {
   return (
@@ -33,6 +51,8 @@ export default function App() {
   });
 
   useEffect(()=>{
+    console.log("working")
+    loadQuestions()
     setUp("first-storage",[])
     setUp("second-storage",[])
     setUp("third-storage",[])

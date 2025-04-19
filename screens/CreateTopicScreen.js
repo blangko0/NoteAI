@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -14,45 +14,52 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { CameraView, CameraType, useCameraPermissions, useCamera } from 'expo-camera';
 import { getData ,storeData} from '../helper/storage';
 import { useNavigation } from '@react-navigation/native';
+import PickDocument from '../service/pdfReader';
+import PickImage from '../service/ImageToText';
+import GenerateDiscussion from '../service/generateDiscussion';
 
 
-const formulas = [
-  {
-    title: 'Power Rule',
-    latex: '\\int x^n \\, dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)',
-    example: '\\int x^3 \\, dx = \\frac{x^4}{4} + C',
-  },
-  {
-    title: 'Constant Function',
-    latex: '\\int 1 \\, dx = x + C',
-    example: '\\int 1 \\, dx = x + C',
-  },
-  {
-    title: 'Constant Multiple Rule',
-    latex: '\\int a \\cdot f(x) \\, dx = a \\cdot \\int f(x) \\, dx',
-    example: '\\int 5x^2 \\, dx = \\frac{5x^3}{3} + C',
-  },
-  {
-    title: 'Exponential Function',
-    latex: '\\int e^x \\, dx = e^x + C',
-    example: '\\int e^x \\, dx = e^x + C',
-  },
-  {
-    title: 'Logarithmic Rule',
-    latex: '\\int \\frac{1}{x} \\, dx = \\ln |x| + C',
-    example: '\\int \\frac{1}{x} \\, dx = \\ln |x| + C',
-  }
-];
+// const formulas = [
+//   {
+//     title: 'Power Rule',
+//     latex: '\\int x^n \\, dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)',
+//     example: '\\int x^3 \\, dx = \\frac{x^4}{4} + C',
+//   },
+//   {
+//     title: 'Constant Function',
+//     latex: '\\int 1 \\, dx = x + C',
+//     example: '\\int 1 \\, dx = x + C',
+//   },
+//   {
+//     title: 'Constant Multiple Rule',
+//     latex: '\\int a \\cdot f(x) \\, dx = a \\cdot \\int f(x) \\, dx',
+//     example: '\\int 5x^2 \\, dx = \\frac{5x^3}{3} + C',
+//   },
+//   {
+//     title: 'Exponential Function',
+//     latex: '\\int e^x \\, dx = e^x + C',
+//     example: '\\int e^x \\, dx = e^x + C',
+//   },
+//   {
+//     title: 'Logarithmic Rule',
+//     latex: '\\int \\frac{1}{x} \\, dx = \\ln |x| + C',
+//     example: '\\int \\frac{1}{x} \\, dx = \\ln |x| + C',
+//   }
+// ];
 
 
 
 const CreateTopicScreen = ({route}) => {
-const navigation = useNavigation()
+  const formData = useRef(new FormData()).current;
 
+  const navigation = useNavigation()
   const [permission, requestPermission] = useCameraPermissions();
   const [title, setTitle] = useState('');
   const [description ,setDescription] = useState("")
+  const [topic ,setTopic] = useState("")
   const [prev, setPrev] = useState([])
+  const [pdfData, setPdfData] = useState("")
+  const [imageData, setImageData] = useState("")
   const [date] = useState(new Date().toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
@@ -67,7 +74,7 @@ const navigation = useNavigation()
          try {
             const fecthing = await getData("second-storage")
             setPrev(fecthing)
-            console.log(fecthing)
+
          } catch (error) {          
          } 
       }
@@ -85,10 +92,11 @@ const navigation = useNavigation()
       Alert.alert("Subject Warning", 'Subject Already Exist.');
       return;
     }
+  
     const heroData = {
       subjectTitle:title,
       description:description,
-      data:formulas,
+      data:topic,
       date:date,
       id: Math.random()*100,
       uid:route.params
@@ -120,6 +128,8 @@ const navigation = useNavigation()
 
 
 
+
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -143,16 +153,12 @@ const navigation = useNavigation()
           />
         </View>
 
-        <View style={{flexDirection:"row", justifyContent:"space-between"}}>
-            <TouchableOpacity style={styles.box} onPress={()=> navigation.navigate("camera")} >
-               <Ionicons name="camera" size={50} color="white" />
-                <Text  style={styles.text}>Image To Text</Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity style={styles.box}>
-            <Ionicons name="add-circle" size={50} color="white" />
-                <Text style={styles.text}>PDF/DOC To Text</Text>
-            </TouchableOpacity>
+          {/* this where theimg and pdf works */}
+
+        <View style={{flexDirection:"row", justifyContent:"space-between"}}>
+             <PickImage style={[styles.box,styles.text]} dataImage={setImageData} formData={formData}/>
+            <PickDocument style={[styles.box,styles.text]} dataPdf={setPdfData} formData={formData}/>
         </View>
 
         <View style={styles.fieldGroup}>
@@ -167,10 +173,8 @@ const navigation = useNavigation()
           />
         </View>
 
-
-        <TouchableOpacity style={styles.button} onPress={handleCreateSubject}>
-          <Text style={styles.buttonText}>Create Topic</Text>
-        </TouchableOpacity>
+        {/* Generate discussion */}
+        <GenerateDiscussion  button={styles.button} buttonText={styles.buttonText} formData={formData} setTopic={setTopic}/>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -207,12 +211,12 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: '#1F2937', // dark grey
     borderRadius: 14,
-    padding: 16,
+    padding: 10,
     fontSize: 16,
     color: '#FFFFFF',
   },
   textArea: {
-    height: 120,
+    height: 50,
     textAlignVertical: 'top',
   },
   previewCard: {
