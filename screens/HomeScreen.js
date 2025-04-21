@@ -26,9 +26,8 @@ function HomeScreen() {
         try {
           const fetching = await getData("first-storage");
           setSubject(fetching || []); // fallback to empty array
-          console.log("Subjects fetched:", fetching?.length);
         } catch (error) {
-          console.error("Error fetching subjects", error);
+          alert("try again")
         }
       };
   
@@ -39,7 +38,6 @@ function HomeScreen() {
 
   const createSubject = (data) => {
     navigation.navigate('CreateSubject');
-    console.log("wroks")
     setRefresh(Math.floor(Math.random)*1000)
   };
 

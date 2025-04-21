@@ -31,10 +31,8 @@ function TopicScreen({route}) {
           );
   
           setTopic(filteredTopics);
-          console.log("Loaded topics for:", route.params.data.item.subjectTitle);
-          console.log("Loaded topics for:",filteredTopics );
         } catch (error) {
-          console.error("Error fetching topics:", error);
+          alert("Error fetching topics:", error);
         }
       };
   

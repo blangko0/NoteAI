@@ -1,52 +1,59 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, View, Text, ActivityIndicator } from 'react-native';
-import axios from 'axios';
 
-const ipAdress = "end point";
+const ipAdress = "https://noteai.online/action/pdf-converter";
 
-function GenerateDiscussion({ button, buttonText, formData,setTopic }) {
+function GenerateDiscussion({ button, buttonText, formData, setTopic, handleCreateSubject, topic }) {
   const [loading, setLoading] = useState(false);
 
   async function generateDiscussion() {
+    setLoading(true);
     const length = Array.from(formData.keys()).length;
-  
+    console.log([...formData.entries()]); // For debugging
+    console.log("it have data")
     if (length) {
       try {
-        setLoading(true); 
-        const response = await axios.post(ipAdress, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+        const response = await fetch(ipAdress, {
+          method: 'POST',
+          body: formData,
         });
-        setTopic(response.data)
-      
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Server returned error:", errorText);
+          throw new Error(`Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setTopic(data);
       } catch (error) {
-        console.error("Failed to generate discussion:", error);
+        alert("Network or server error occurred.");
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
-    }else{
-      alert("No entry on formdata")
+    } else {
+      alert("No entry on formdata");
     }
+
+   setLoading(false); // This should remain until you restore the try-catch logic
   }
 
   return (
     <View>
-      <TouchableOpacity
-        style={button}
-        onPress={generateDiscussion}
-        disabled={loading} // Disable while loading
-      >
-        {
-          loading ? (
-            <Text style={buttonText}>Loading...</Text>
-            // Or use ActivityIndicator below if you want a spinner instead
-            // <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={buttonText}>Create Subject</Text>
-          )
-        }
-      </TouchableOpacity>
+      {loading ? (
+        <View style={{backgroundColor:"blue",borderRadius:10,alignItems:"center",padding:20}}>
+          <ActivityIndicator size="large" color="#E50914" />
+          <Text style={[buttonText,{letterSpacing:10}]}>Loading...</Text>
+        </View>
+      ) : (
+        <TouchableOpacity
+          style={button}
+          onPress={!topic.discussion?.length ? generateDiscussion :  () => handleCreateSubject()}
+          disabled={loading}
+        >
+          <Text style={buttonText}>{!topic.discussion?.length ? "Generate Discussion" : "Save Now"}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

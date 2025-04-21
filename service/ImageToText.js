@@ -16,7 +16,7 @@ const PickImage =  ({style,dataImage,formData}) => {
         
           if (!result.canceled && result.assets && result.assets.length > 0) {
             const file = result.assets[0];
-            formData.append("image",{
+            formData.append("file",{
               uri: file.uri,
               name: file.name,
               type: file.mimeType || 'application/octet-stream',

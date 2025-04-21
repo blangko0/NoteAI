@@ -28,7 +28,6 @@ const CreateSubjectScreen = ({ navigation }) => {
          try {
             const fecthing = await getData("first-storage")
             setPrev(fecthing)
-            console.log(fecthing)
          } catch (error) {          
          } 
       }
@@ -110,7 +109,9 @@ const CreateSubjectScreen = ({ navigation }) => {
           </View>
         )}
 
-       
+        <TouchableOpacity style={styles.button} onPress={handleCreateSubject}>
+          <Text style={styles.buttonText}>Create Subject</Text>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );

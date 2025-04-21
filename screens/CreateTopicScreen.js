@@ -70,6 +70,7 @@ const CreateTopicScreen = ({route}) => {
   
   
   useEffect(()=>{
+    console.log(topic.discussion?.length)
       const fecthSubject = async() =>{
          try {
             const fecthing = await getData("second-storage")
@@ -79,7 +80,7 @@ const CreateTopicScreen = ({route}) => {
          } 
       }
       fecthSubject()
-  },[])
+  },[topic])
 
   const handleCreateSubject = () => {
 
@@ -92,11 +93,13 @@ const CreateTopicScreen = ({route}) => {
       Alert.alert("Subject Warning", 'Subject Already Exist.');
       return;
     }
-  
+    if(!topic.discussion?.length){
+      return;
+    }
     const heroData = {
       subjectTitle:title,
       description:description,
-      data:topic,
+      data:topic.discussion,
       date:date,
       id: Math.random()*100,
       uid:route.params
@@ -174,7 +177,7 @@ const CreateTopicScreen = ({route}) => {
         </View>
 
         {/* Generate discussion */}
-        <GenerateDiscussion  button={styles.button} buttonText={styles.buttonText} formData={formData} setTopic={setTopic}/>
+        <GenerateDiscussion  button={styles.button} buttonText={styles.buttonText} formData={formData} setTopic={setTopic} handleCreateSubject={handleCreateSubject} topic={topic}/>
       </ScrollView>
     </KeyboardAvoidingView>
   );

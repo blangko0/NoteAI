@@ -6,6 +6,7 @@ import TopicScreen from './screens/TopicScreen';
 import CreateTopicScreen from './screens/CreateTopicScreen';
 import Cameras from './service/ImageToText';
 import ReadScreen from './screens/ReadScreen';
+import QuizScreen from './screens/QuizScreen';
 
 export default function Stack() {
     const Stack = createNativeStackNavigator();
@@ -19,6 +20,7 @@ export default function Stack() {
       <Stack.Screen name="CreateTopic" component={CreateTopicScreen}   options={{ headerShown: false }}/>
       <Stack.Screen name="camera" component={Cameras}  options={{ headerShown: false }}/>
       <Stack.Screen name="ReadScreen" component={ReadScreen}  options={{ headerShown: false }}/>
+      <Stack.Screen name="QuizScreen" component={QuizScreen}  options={{ headerShown: false }}/>
       
       
    </Stack.Navigator>

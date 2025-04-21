@@ -14,28 +14,73 @@ import * as Speech from 'expo-speech';
 import Math from '../components/Math';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TextToSpeech from '../service/textToSpeech';
+import QuizGenerator from '../service/quizGenerator';
 
    
 function ReadScreen({ route }) {
   const navigation = useNavigation();
   const [isPlaying,setPlaying ] =useState(false)
+  const [speechQueue, setSpeechQueue] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const motherData = route.params.data.item
  
 
-  const speak = () => {
-    
-     if(!isPlaying){
-      Speech.speak(motherData.data);      
-      setPlaying(true)
-    }else{
-      Speech.stop()
-      setPlaying(false)
-    }
 
+  const chunkText = (text, maxLength = 200) => {
+    const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
+    const chunks = [];
+    let chunk = "";
+  
+    for (let sentence of sentences) {
+      if ((chunk + sentence).length < maxLength) {
+        chunk += sentence;
+      } else {
+        if (chunk) chunks.push(chunk.trim());
+        chunk = sentence;
+      }
+    }
+  
+    if (chunk) chunks.push(chunk.trim());
+    return chunks;
   };
 
-  const createTopic = () => {
-    navigation.navigate('CreateTopic');
+  
+
+
+const playChunks = async (chunks, index = 0) => {
+  if (index >= chunks.length) {
+    setPlaying(false);
+    setCurrentIndex(0);
+    return;
+  }
+
+  setCurrentIndex(index);
+  Speech.speak(chunks[index], {
+    onDone: () => {
+      playChunks(chunks, index + 1);
+    },
+    onStopped: () => {
+      setPlaying(false);
+      setCurrentIndex(0);
+    },
+  });
+};
+
+const speak = () => {
+  if (!isPlaying) {
+    const chunks = chunkText(motherData.data);
+    setSpeechQueue(chunks);
+    setPlaying(true);
+    playChunks(chunks);
+  } else {
+    Speech.stop();
+    setPlaying(false);
+    setCurrentIndex(0);
+  }
+};
+
+  const gotoQuiz = (quiz) => {
+    navigation.navigate('QuizScreen',quiz);
   };
 
   return (
@@ -62,7 +107,7 @@ function ReadScreen({ route }) {
        }
       </ScrollView>
 
-      <ActionButton click={createTopic} />
+      <QuizGenerator item={motherData} gotoQuiz={gotoQuiz}/>
     </View>
   );
 }
